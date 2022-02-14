@@ -1,0 +1,162 @@
+{% extends "layout.html" %}
+{% block content %}
+    <script>
+$(document).ready(function(){
+    $('#addGame').click(function(){
+        $('.ui.modal').modal('show');
+    });
+
+    $('#save').click(function(){
+        var vendorId = $('#vendorId').val();
+        var vendor = $('#vendor').val();
+        var gameName = $('#gameName').val();
+        var active, mobile, visible;
+
+        if ($('#active').is(':checked')) {
+            active = true;
+        }else{
+            active = false;
+        }
+        if ($('#mobile').is(':checked')) {
+            mobile = true;
+        }else{
+            mobile = false;
+        }
+        if ($('#visible').is(':checked')) {
+            visible = true;
+        }else{
+            visible = false;
+        }
+
+        $.ajax({
+            url: '/game',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({"vendorId":vendorId,"vendor":vendor,"gameName":gameName,"active":active,"mobile":mobile,"visible":visible}),
+            dataType: 'json'
+        })
+        $('.ui.modal').modal('hide');
+        setTimeout(function(){
+            $( "#main" ).load( "#main" );
+         }, 1000); //refresh every 2 seconds
+    });
+
+});
+    </script>
+    <form>
+        <div class="ui input">
+            <input name="vendorId"
+                   type="text"
+                   placeholder="Vendor Id "
+                   value="{{ vendorId }}">
+        </div>
+        <div class="ui input">
+            <input name="gameName" type="text" placeholder="Name" value="{{ gameName }}">
+        </div>
+        <div class="ui toggle checkbox">
+            <input type="checkbox"
+                   name="active"
+                   {% if active %}checked="checked"{% endif %}>
+            <label>Active games</label>
+        </div>
+        <div class="ui toggle checkbox">
+            <input type="checkbox"
+                   name="visible"
+                   {% if visible %}checked="checked"{% endif %}>
+            <label>Visible</label>
+        </div>
+        <button type="submit" class="ui primary button">Filter</button>
+    </form>
+    <table id="result" class="ui celled padded blue table">
+        <thead>
+            <tr>
+                <th class="single line">Vendor ID</th>
+                <th>Name</th>
+                <th>Vendor</th>
+                <th>Mobile</th>
+                <th>Active</th>
+                <th>Visible</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in games %}
+                <tr>
+                    <td data-cy="VendorId">{{ game.vendorId }}</td>
+                    <td data-cy="Name">{{ game.name }}</td>
+                    <td data-cy="Vendor">{{ game.vendor }}</td>
+                    <td data-cy="Mobile">{{ game.mobile }}</td>
+                    <td data-cy="Active">{{ game.active }}</td>
+                    <td data-cy="Visible">{{ game.visible }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">Add game</div>
+        <div class="content">
+            <div class="ui form">
+                <div class="field">
+                    <label>Vendor</label>
+                    <div class="three fields">
+                        <div class="field">
+                            <input type="number" id="vendorId" placeholder="Vendor Id">
+                        </div>
+                        <div class="field">
+                            <select id="vendor" class="ui fluid dropdown">
+                                <option value="GreenTube">
+                                    GreenTube
+                                </option>
+                                <option value="Fazi">
+                                    Fazi
+                                </option>
+                                <option value="Synot">
+                                    Synot
+                                </option>
+                                <option value="Kajot">
+                                    Kajot
+                                </option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <input type="text" id="gameName" placeholder="Game name">
+                        </div>
+                    </div>
+                </div>
+                <div class="ui segment">
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="active">
+                            <label>Active</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui segment">
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="visible">
+                            <label>Visible</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui segment">
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="mobile">
+                            <label>Mobile</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div id="save" class="ui positive right labeled icon button">
+                Add
+                <i class="plus icon"></i>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button id="addGame" class="ui primary button">Add game</button>
+    </div>
+{% endblock %}
